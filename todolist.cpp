@@ -8,7 +8,7 @@ struct todolist{
     int id;
 };
 
-int ID ;
+int ID =0 ;  
 void banner();
 void AddTask();
 void ShowTask();
@@ -28,7 +28,7 @@ int main(){
 
         int choice;
         cout<<"Enter choice "<<endl;
-        cin>>choice<<endl;
+        cin>> choice;
 
         switch (choice)
         {
@@ -37,19 +37,19 @@ int main(){
               break;
 
             case 2:
-              //ShowTask();
+              ShowTask();
               break;
             
             case 3:
-             // SearchTask();
+             SearchTask();
               break;
 
             case 4:
-              //DeleteTask();
+              DeleteTask();
               break;
             
             case 5:
-              //UpdateTask();
+              UpdateTask();
               break;
             
             default:
@@ -84,14 +84,117 @@ void AddTask(){
 
         char more;
         cout<<"Do you want to add more tasks? (y/n)"<<endl;
-        cin>>more<<endl;
+        cin>> more;
         if(more=='y'){
             AddTask();
           }
-        else(){
+        else{
         cout<<"Added suceedfully"<<endl;
         }
     }
 }
+    void ShowTask(){
+    banner();
+    ifstream file("todo.txt");
+    string line;
+    int count = 0;
+    cout << "ID\tTask" << endl;
+    while (getline(file, line)) {
+        if (count % 2 == 0) {
+            cout << line << "\t";
+        } else {
+            cout << line << endl;
+        }
+        count++;
+    }
+    file.close();
+}
 
+void SearchTask(){
+    banner();
+    ifstream file("todo.txt");
+    string line;
+    int count = 0;
+    string search;
+    cout << "Enter task to search: ";
+    cin.ignore();
+    getline(cin, search);
+    bool found = false;
+    while (getline(file, line)) {
+        if (count % 2 == 1 && line.find(search) != string::npos) {
+            found = true;
+            cout << "Task found: " << line << endl;
+        }
+        count++;
+    }
+    if (!found) {
+        cout << "Task not found." << endl;
+    }
+    file.close();
+}
 
+void DeleteTask(){
+    banner();
+    ifstream file("todo.txt");
+    ofstream temp("temp.txt");
+    string line;
+    int count = 0;
+    int id;
+    cout << "Enter ID of task to delete: ";
+    cin >> id;
+    bool found = false;
+    while (getline(file, line)) {
+        if (count % 2 == 0 && stoi(line) != id) {
+            temp << line << endl;
+        } else if (count % 2 == 1) {
+            temp << line << endl;
+        }
+        count++;
+    }
+    if (!found) {
+        cout << "Task not found." << endl;
+    } else {
+        cout << "Task deleted successfully." << endl;
+    }
+    file.close();
+    temp.close();
+    remove("todo.txt");
+    rename("temp.txt", "todo.txt");
+}
+
+void UpdateTask(){
+    banner();
+    ifstream file("todo.txt");
+    ofstream temp("temp.txt");
+    string line;
+    int count = 0;
+    int id;
+    cout << "Enter ID of task to update: ";
+    cin >> id;
+    bool found = false;
+    string newTask;
+    while (getline(file, line)) {
+        if (count % 2 == 0 && stoi(line) != id) {
+            temp << line << endl;
+        } else if (count % 2 == 0 && stoi(line) == id) {
+            found = true;
+            cout << "Enter new task: ";
+            cin.ignore();
+            getline(cin, newTask);
+            temp << line << endl;
+            temp << newTask << endl;
+        } else {
+            temp << line << endl;
+        }
+        count++;
+    }
+    if (!found) {
+        cout << "Task not found." << endl;
+    } else {
+        cout << "Task updated successfully." << endl;
+    }
+    file.close();
+    temp.close();
+    remove("todo.txt");
+    rename("temp.txt", "todo.txt");
+}
